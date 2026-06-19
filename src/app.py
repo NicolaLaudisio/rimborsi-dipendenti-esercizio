@@ -36,28 +36,41 @@ def _registra(form):
     }
     ok, motivazione = validator.valida(richiesta)
     if ok:
-        gia_riconosciuta = storage.esente_riconosciuta_nel_mese(
-            richieste, richiesta["dipendente"], storage.mese(richiesta)
-        )
-        esente, imponibile, dettaglio = calculator.calcola(richiesta, gia_riconosciuta)
-        richiesta.update(
-            stato="valida",
-            motivazione="",
-            quota_esente=esente,
-            quota_imponibile=imponibile,
-            dettaglio=dettaglio,
-        )
-    else:
-        richiesta.update(
-            stato="respinta",
-            motivazione=motivazione,
-            quota_esente=0.0,
-            quota_imponibile=0.0,
-            dettaglio=None,
-        )
+        ok, motivazione = validator.compatibile(richiesta, richieste)
+    richiesta.update(
+        stato="valida" if ok else "respinta",
+        motivazione="" if ok else motivazione,
+        quota_esente=0.0,
+        quota_imponibile=0.0,
+        dettaglio=None,
+    )
     richieste.append(richiesta)
+    # Una nuova richiesta valida può cambiare la ripartizione del plafond delle altre
+    # richieste dello stesso mese: si ricalcola l'intero gruppo in ordine di data (Sez. 1).
+    if ok:
+        _ricalcola_mese(richieste, richiesta["dipendente"], storage.mese(richiesta))
     storage.salva(richieste)
     return richiesta
+
+
+def _ricalcola_mese(richieste, dipendente, mese):
+    """Riallinea le quote del gruppo (dipendente, mese) imputando il plafond per data."""
+    gruppo = sorted(
+        (
+            r
+            for r in richieste
+            if r["stato"] == "valida"
+            and r["dipendente"] == dipendente
+            and storage.mese(r) == mese
+        ),
+        key=lambda r: (r["data"], r["id"]),
+    )
+    for r, (esente, imponibile, dettaglio) in zip(
+        gruppo, calculator.ripartisci_mese(gruppo)
+    ):
+        r.update(
+            quota_esente=esente, quota_imponibile=imponibile, dettaglio=dettaglio
+        )
 
 
 @app.get("/")
@@ -110,27 +123,28 @@ def riepilogo():
         gruppo["esente"] = round(gruppo["esente"] + r["quota_esente"], 2)
         gruppo["imponibile"] = round(gruppo["imponibile"] + r["quota_imponibile"], 2)
         gruppo["richieste"] += 1
-    righe = [
-        {
-            "mese": mese,
-            "dipendente": dipendente,
-            "esente": dati["esente"],
-            "imponibile": dati["imponibile"],
-            "richieste": dati["richieste"],
-            "percentuale_plafond": min(
-                round(dati["esente"] / rules.PLAFOND_MENSILE * 100), 100
-            ),
-        }
-        for (mese, dipendente), dati in sorted(gruppi.items(), reverse=True)
-    ]
-    return render_template(
-        "riepilogo.html", righe=righe, plafond=rules.PLAFOND_MENSILE
-    )
+    righe = []
+    for (mese, dipendente), dati in sorted(gruppi.items(), reverse=True):
+        plafond = rules.plafond_mensile(mese)
+        righe.append(
+            {
+                "mese": mese,
+                "dipendente": dipendente,
+                "esente": dati["esente"],
+                "imponibile": dati["imponibile"],
+                "richieste": dati["richieste"],
+                "plafond": plafond,
+                "percentuale_plafond": min(round(dati["esente"] / plafond * 100), 100),
+            }
+        )
+    return render_template("riepilogo.html", righe=righe)
 
 
 @app.get("/normativa")
 def normativa():
-    return render_template("normativa.html", rules=rules)
+    return render_template(
+        "normativa.html", regime=rules.regime_corrente(), categorie=rules.CATEGORIE
+    )
 
 
 if __name__ == "__main__":
