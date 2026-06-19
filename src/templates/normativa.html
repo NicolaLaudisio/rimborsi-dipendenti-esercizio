@@ -2,7 +2,7 @@
 {% block titolo %}Normativa vigente{% endblock %}
 {% block contenuto %}
 <h1>Normativa vigente</h1>
-<p class="nota">Parametri applicati dal sistema. Fonte: {{ rules.RIFERIMENTO_NORMATIVO }}.</p>
+<p class="nota">Parametri applicati dal sistema. Fonte: {{ regime.riferimento }}.</p>
 
 <table class="tabella">
   <thead>
@@ -12,23 +12,23 @@
     </tr>
   </thead>
   <tbody>
-    {% for codice, massimale in rules.MASSIMALI_GIORNALIERI.items() %}
+    {% for codice, massimale in regime.massimali_giornalieri.items() %}
     <tr>
-      <td>{{ rules.CATEGORIE[codice] }}</td>
+      <td>{{ categorie[codice] }}</td>
       <td class="num">{{ "%.2f"|format(massimale) }} € / giorno</td>
     </tr>
     {% endfor %}
     <tr>
-      <td>{{ rules.CATEGORIE["chilometrico"] }}</td>
-      <td class="num">{{ "%.2f"|format(rules.MASSIMALE_KM) }} € / km</td>
+      <td>{{ categorie["chilometrico"] }}</td>
+      <td class="num">{{ "%.2f"|format(regime.massimale_km) }} € / km</td>
     </tr>
     <tr>
-      <td>{{ rules.CATEGORIE["alloggio"] }}</td>
-      <td class="num">{{ "%.2f"|format(rules.MASSIMALE_NOTTE) }} € / notte</td>
+      <td>{{ categorie["alloggio"] }}</td>
+      <td class="num">{{ "%.2f"|format(regime.massimale_notte) }} € / notte</td>
     </tr>
     <tr class="riga-evidenziata">
       <td><strong>Plafond mensile complessivo per dipendente</strong></td>
-      <td class="num"><strong>{{ "%.2f"|format(rules.PLAFOND_MENSILE) }} € / mese</strong></td>
+      <td class="num"><strong>{{ "%.2f"|format(regime.plafond_mensile) }} € / mese</strong></td>
     </tr>
   </tbody>
 </table>
@@ -41,5 +41,11 @@
     <li>La quota esente effettiva è limitata dalla capienza residua del plafond mensile del dipendente.</li>
     <li>La parte eccedente è quota imponibile e concorre alla formazione del reddito.</li>
   </ol>
+  <p class="nota">
+    Regole particolari (dal 01/01/2026): l'indennità lavoro agile è esente al massimo per
+    12 giornate al mese; le trasferte estere oltre la 5ª giornata subiscono una riduzione
+    progressiva del massimale; lavoro agile e trasferta non sono cumulabili nella stessa
+    giornata.
+  </p>
 </section>
 {% endblock %}

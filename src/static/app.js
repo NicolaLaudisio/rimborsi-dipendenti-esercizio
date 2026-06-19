@@ -5,6 +5,7 @@ const CAMPI_PER_CATEGORIA = {
   pasto: "giorni",
   chilometrico: "km",
   alloggio: "notti",
+  lavoro_agile: "giorni",
 };
 
 const selettoreCategoria = document.getElementById("categoria");

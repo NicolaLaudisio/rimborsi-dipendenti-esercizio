@@ -5,11 +5,17 @@ dipendenti. Per ogni richiesta l'applicazione calcola la **quota esente** IRPEF 
 **quota imponibile** secondo i massimali della normativa vigente, applica le regole di
 validazione e tiene traccia del plafond mensile di esenzione di ciascun dipendente.
 
+I massimali e il plafond dipendono dalla **data di sostenimento**: spese fino al
+31/12/2025 seguono la Circolare MEF 41/2024 (plafond 1.200 €), spese dal 01/01/2026 la
+Circolare MEF 18/2026 (massimali aggiornati, plafond 1.400 €, indennità lavoro agile,
+riduzione progressiva per trasferte estere > 5 giorni, incompatibilità lavoro
+agile/trasferta).
+
 ## Funzionalità
 
 - **Nuova richiesta**: inserimento di una richiesta di rimborso (trasferta Italia,
-  trasferta estero, pasto, chilometrico, alloggio) con calcolo immediato di quota
-  esente e imponibile e dettaglio del calcolo.
+  trasferta estero, pasto, chilometrico, alloggio, indennità lavoro agile) con calcolo
+  immediato di quota esente e imponibile e dettaglio del calcolo.
 - **Richieste**: elenco di tutte le richieste, filtrabile per dipendente e mese, con
   stato (valida / respinta) e dettaglio espandibile.
 - **Riepilogo mensile**: totali esente/imponibile per dipendente e mese, con barra di

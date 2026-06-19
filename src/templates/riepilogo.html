@@ -2,7 +2,7 @@
 {% block titolo %}Riepilogo mensile{% endblock %}
 {% block contenuto %}
 <h1>Riepilogo mensile per dipendente</h1>
-<p class="nota">Plafond mensile di esenzione: {{ "%.2f"|format(plafond) }} € per dipendente.</p>
+<p class="nota">Plafond mensile di esenzione per dipendente, variabile in base al mese di sostenimento.</p>
 
 <table class="tabella">
   <thead>
@@ -28,7 +28,7 @@
           <div class="barra-plafond-riempimento {% if riga.percentuale_plafond >= 100 %}piena{% endif %}"
                style="width: {{ riga.percentuale_plafond }}%"></div>
         </div>
-        <span class="percentuale">{{ riga.percentuale_plafond }}%</span>
+        <span class="percentuale">{{ riga.percentuale_plafond }}% di {{ "%.2f"|format(riga.plafond) }} €</span>
       </td>
     </tr>
     {% else %}

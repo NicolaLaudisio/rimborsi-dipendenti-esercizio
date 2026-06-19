@@ -26,15 +26,3 @@ def prossimo_id(richieste):
 def mese(richiesta):
     """Mese di riferimento di una richiesta, nel formato AAAA-MM."""
     return richiesta["data"][:7]
-
-
-def esente_riconosciuta_nel_mese(richieste, dipendente, mese_riferimento):
-    """Somma delle quote esenti delle richieste valide del dipendente nel mese."""
-    totale = sum(
-        r["quota_esente"]
-        for r in richieste
-        if r["dipendente"] == dipendente
-        and r["stato"] == "valida"
-        and mese(r) == mese_riferimento
-    )
-    return round(totale, 2)
